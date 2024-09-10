@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: composite-service
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: true
+        all-namespaces: true # set to true if services are in different namespaces
+
+logging:
+  level:
+    org.springframework: INFO
+    com.example: DEBUG
+
+service:
+  date-service:
+    url: ${SERVICE_DATE_SERVICE_URL}
+  time-service:
+    url: ${SERVICE_TIME_SERVICE_URL}

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: composite-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: composite-service
+  template:
+    metadata:
+      labels:
+        app: composite-service
+    spec:
+      containers:
+        - name: composite-service
+          image: aguz99aa/composite-service
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVICE_DATE_SERVICE_URL
+              value: "http://date-service:8080/date"
+            - name: SERVICE_TIME_SERVICE_URL
+              value: "http://time-service:8080/time"
+            - name: TZ
+              value: "Europe/Rome"  # Imposta la timezone desiderata
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: composite-service
+  #namespace: myapp-namespace
+spec:
+  selector:
+    app: composite-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: LoadBalancer

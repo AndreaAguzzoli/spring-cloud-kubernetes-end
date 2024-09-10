@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: time-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: time-service
+  template:
+    metadata:
+      labels:
+        app: time-service
+    spec:
+      containers:
+        - name: time-service
+          image: aguz99aa/time-service
+          ports:
+            - containerPort: 8080
+          env:
+            - name: TZ
+              value: "Europe/Rome"  # Imposta la timezone desiderata
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: time-service
+  #namespace: myapp-namespace
+spec:
+  selector:
+    app: time-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: LoadBalancer

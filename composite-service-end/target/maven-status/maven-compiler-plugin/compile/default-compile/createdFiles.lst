@@ -1,0 +1,5 @@
+com/example/composite/CompositeApplication.class
+com/example/composite/CompositeController.class
+com/example/composite/LocalDateWithTimestamp.class
+com/example/composite/LocalTimeWithTimestamp.class
+com/example/composite/LocalDateTimeWithTimestamp.class
