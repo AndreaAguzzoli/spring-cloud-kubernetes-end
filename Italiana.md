@@ -10,7 +10,7 @@ Kubernetes è stato sviluppato da Google ed è diventato open-source a partire d
 
 ### 1.2. Benefici e Motivazioni
 
-Come abbiamo detto Kubernetes è un **orchestratore di container**. Esso è in grado di scalare su larga scala in modo efficiente e affidabile. Possiamo immaginare un orchestratore di container come un **higly-skilled Tetris player**, containers are the blocks, servers are the boards.
+Come abbiamo detto Kubernetes è un **orchestratore di container**. Esso è in grado di scalare su larga scala in modo efficiente e affidabile. Possiamo immaginare un orchestratore di container come un **higly-skilled Tetris player**, i containers sono i blocchi mentre i servers sono le tavole di gioco.
 
 Uno dei principali vantaggi di Kubernetes è la sua capacità di automatizzare molte operazioni, il che migliora l'efficienza e riduce il carico di lavoro. La piattaforma semplifica la scalabilità delle applicazioni, sia aggiungendo ulteriori istanze (scalabilità orizzontale) sia aumentando le risorse delle istanze esistenti (scalabilità verticale). Inoltre, Kubernetes mantiene lo stato desiderato delle applicazioni, garantendo che il numero di repliche e altre configurazioni rimangano coerenti anche in caso di guasti o modifiche.
 
