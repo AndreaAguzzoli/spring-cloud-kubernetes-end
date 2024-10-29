@@ -156,5 +156,28 @@ Oltre al monitoraggio anche il **LOGGING** è fondamentale per capire il comport
 
 ## 7. Sicurezza
 
+La sicurezza è una questione importante nella gestione di un cluster K8S perchè i servizi esposti possono essere vittima di attacchi informatici.
 
+Partendo dai Pod e dai Container una informazione interessante che ho trovato è quella di evitare di seguire guide o materiali che fanno uso delle **Pod Security Policies** che sono state prima deprecate e poi rimosse. Al loro posto sono state inserite le **Pod Security Admission** che possono applicare in modo semplice diversi livelli di sicurezza a livello di namespace.
 
+Per garantire una maggiore sicurezza è bene seguire anche una serie di **best practice** come **utilizzare immagini sicure**, **utilizzare le PSA**, utilizzare **strumenti di monitoraggio della sicurezza** in fase di esecuzione e **SOPRATTUTTO LIMITARE LE RISORSE** assegnate ai pods, per esempio con `limits` o `request` nella fase di definizione del Pod per evitare attacchi di tipo DOS. Sotto ho poi posto un semplice esempio di come utilizzare `limits` e `requests`.
+
+Altri aspetti importanti per la sicurezza sono il **CONTROLLO DEL TRAFFICO** e il **MONITORAGGIO DELLA RETE**. Un ruolo importante lo giocano le **Network Policies** attraverso le quali è possibile decidere quali pods possono inviare e ricevere traffico. Inoltre sarebbe importante l'utilizzo di strumenti di monitoraggio del traffico per avere una visione più chiara del traffico e segnalare anomalie.
+
+## 8. Dashboard
+
+Ho poi dedicato un breve capitolo alle Dashboard, in quanto sono presenti diverse possibilità tra cui è possibile scegliere e sono uno strumento importante per chi è meno avvezzo ad un uso di Kubernetes da terminale. Ho elencato oltre a quelle predefinite anche quelle che online ho visto essere le più gettonate.
+
+Magari dopo quando vediamo l'esempio apro quella di Minikube.
+
+## 9. BEST PRACTICE
+
+Il capitolo 9 è dedicato alle best practice, sostanzialmente non aggiunge niente perchè sono tutte cose già dette, ma fa un elenco delle best practice per utilizzare K8S in modo corretto e fa capire che le cose dette in precedenza non sono cose teoriche inutili ma sono cose importanti. Le uniche cose nuove sono **ELIMINARE RISORSE ORFANE** e **BACKUP DEI DATI E DELLE CONFIGURAZIONI**. Il primo è importante per non sprecare risorse con risorse inutilizzate e il secondo è importante per garantire il ripristino in caso di incovenienti.
+
+## 10. Conclusione
+
+L'ultimo capitolo rappresenta una mia conclusione su K8S che dice che K8S fornisce sicuramente funzionalità importanti e presenta numerosi vantaggi nel suo utilizzo. Tuttavia è anche un argomento molto complesso e insidioso che può causare problemi. 
+
+Non presenta particolari svantaggi, tuttavia il rischio è che non sia la scelta giusta a causa della elevata complessità e dei costi che ne derivano. Non solo in termini economici, infatti repliche, nodi e cluster che su Minikube in locale ovviamente non costituiscono problemi in una applicazione in produzione su un cloud provider rappresentano un costo non trascurabile. Costi importanti sono anche quelli riguardanti il tempo e la complessità operativa e i costi derivanti dalla formazione del personale che deve certamente essere avanzata.
+
+Un altro possibile problema è costituito dal vendor lock-in in quanto l'utilizzo di funzionalità avanzate di un dato provider può vincolarci a quello e impedirci di cambiare in modo rapido e semplice in caso di volontà di cambiare.
