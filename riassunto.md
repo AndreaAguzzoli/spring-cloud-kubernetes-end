@@ -138,3 +138,23 @@ Mi soffermo un attimo su un concetto presente in questo capitolo che è il contr
 
 ## 5. Storage
 
+I dati presenti all'interno dei container sono effimeri e questo rappresenta un problema per quelle applicazioni che necessitano di mantenere i dati. Infatti hanno un ciclo di vita dipendente da quello del container stesso. Per questo in Kubernetes sono stati introdotti i **Volumi** che sono una risorsa correlata al Pod e che ha un ciclo di vita direttamente collegato a quello del pod stesso. Tuttavia ha un ciclo di vita che non dipende da quello dei container, essi possono essere eliminati, riavviati o ditrutti ma i dati non verranno eliminati. Questo è particolarmente utile per mantenere dati temporanei all'interno di un Pod o per la condivisione di dati tra container all'interno dello stesso Pod.
+
+Un altro concetto di storage importante sono i **Persistent Volumes** che hanno un ciclo di vita indipendente dal ciclo di vita del Pod e sono utili per quelle applicazioni che necessitano di mantenere una persistenza dei dati anche oltre il ciclo di vita dei Pod.
+
+Un altro concetto sono le **Persistent Volumes Claims** che sono richieste di storage da parte di utenti e applicazioni. Nelle richieste sono presenti le caratteristiche richieste e Kubernetes cerca quindi un PV disponibile che soddisfi le richieste. Se ne trova uno disponibile lo associa a quel PVC altrimenti la richiesta rimane in stato di **pending** fino a che non si trova un PV che la soddisfi.
+
+Viene appunto spiegato più nel dettaglio il ciclo di vita di queste richieste.
+
+## 6. Monitoraggio e Loggging
+
+Monitorare lo stato del cluster e delle applicazioni in esecuzione su Kubernetes è essenziale per garantire la stabilità, le prestazioni e la disponibilità del sistema. Il monitoraggio e il logging aiutano a rilevare problemi prima che possano diventare critici.
+
+Per quanto riguarda il **MONITORAGGIO** uno dei primi aspetti da monitorare è lo stato del cluster stesso e per farlo si utilizzano strumenti di monitoraggio che raccolgono metriche sulle diverse componenti del cluster. Uno dei più utilizzati è **Prometheus**. Per il quale è stata prodotta una guida all'installazione attraverso il gestore di pacchetti **HELM** visto che spesso sono installati assieme ho proposto anche come accedere a **Grafana**.
+
+Oltre al monitoraggio anche il **LOGGING** è fondamentale per capire il comportamento delle applicazioni in esecuzione nel cluster e tracciare la causa dei problemi. Kubernetes genera grandi quantità di log e quindi centralizzare e gestire questi log risulta importante per capirci qualcosa. Una delle soluzioni più gettonate è quella dell'integrazione dell'**ELK STACK** dove sono presenti **ElasticSearch, LogStash e Kibana**. Anche per questo come nel caso precedente ho prodotto una guida all'installazione e all'avvio sempre utilizzando **HELM** come gestore dei pacchetti.
+
+## 7. Sicurezza
+
+
+
