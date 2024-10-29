@@ -2,51 +2,46 @@
 
 ## 1. Introduzione
 
-K8S è una piattaforma open-source ideata per automatizzare il deployment, la scalabilità e la gestione di applicazioni containerizzate. Oggi è diventato lo standard de facto per la gestione dei container.
+K8S è una **piattaforma open-source** ideata per automatizzare il **deployment**, la **scalabilità** e la **gestione** di applicazioni containerizzate. Oggi è diventato lo **standard de facto** per la gestione dei container.
 
+Le principali caratteristiche che lo hanno reso tale sono la capacità di **scalare le applicazioni** in modo rapido ed efficiente, l'automatizzazione delle operazioni, la capacità di **mantenere uno stato desiderato** anche in caso di errori, **portabilità** garantita anche su infrastrutture cloud o on-premises e facilità di update tramite **rolling updates e rollback**.
 
+## Architettura
 
-Spring Cloud Kubernetes integra Spring Cloud con Kubernetes, fornendo strumenti per costruire applicazioni cloud-native che sfruttano le potenzialità del cloud. Questa integrazione supporta la gestione della configurazione, la scoperta dei servizi e l'interazione con le risorse di Kubernetes, semplificando la creazione di microservizi distribuiti.
+Un **Cluster K8S** è un gruppo di host che eseguono container Linux. L'architettura di un cluster è basata su un modello di tipo **master-worker** dove il master è il **control-plane-node** che gestisce e coordina i **worker nodes** sono uno o più nodi di elaborazione dove vengono ospitati i **pods**.  
 
-## 2. Requisiti
+### 2.1. CP
 
-Per utilizzare Spring Cloud Kubernetes, è necessario avere un cluster Kubernetes funzionante e familiarità con i concetti di base di Kubernetes e Spring. Si raccomanda di utilizzare versioni compatibili di Spring Boot e Spring Cloud, verificando la documentazione per i requisiti specifici.
+Le principali componenti del control-plane sono:
+- **Kube-APIserver**: è un front-end per le API di Kubernetes
+- **etcd**: database contenente le info e le configurazioni del cluster
+- **Kube-Scheduler**: assegna i pods ai nodi
+- **Kube-Controller-Manager**: gestione dei controller, responsabili di mantenere uno stato corretto e lo stato desiderato
+- **Cloud-Controller-Manager**: gestisce le interazioni con i cloud provider
 
-## 3. Configurazione
+### 2.2. Worker
+Il **CP** assegna i pods ai **worker nodes** che sono responsabili di eseguire i container delle applicazioni. Infatti ogni worker ospita i pods che contengono uno o più container e forniscono l'ambiente di runtime per farli funzionare. Principali componenti:
 
-La configurazione di Spring Cloud Kubernetes richiede l'aggiunta di specifiche dipendenze nel file `pom.xml` del progetto Maven. Queste dipendenze permettono all'applicazione di interagire con Kubernetes. Esempi di dipendenze includono `spring-cloud-starter-kubernetes` e `spring-cloud-starter-kubernetes-config`.
+- **Kubelet** agente eseguito su ogni nodo ch verifica l’esecuzione dei pod
+- **Kube-proxy** proxy eseguito su ogni nodo che gestisce regole di networking
+- **Container Runtime** sw responsabile dell'esecuzione dei container
 
-## 4. Configurazione Remota
+### 2.3. Addons
 
-Spring Cloud Kubernetes consente la gestione centralizzata delle configurazioni attraverso `ConfigMap` e `Secrets` di Kubernetes. Questi strumenti consentono di memorizzare e gestire le configurazioni in modo sicuro. La configurazione può essere caricata automaticamente all'avvio dell'applicazione, assicurando che i valori siano aggiornati.
+Estendono le funzionalità del cluster con componenti aggiuntivi come DNS, dashboard di gestione e strumenti di monitoraggio e logging.
 
-## 5. Scoperta dei Servizi
+La maggior parte degli **addons** può essere installate attraverso file di configurazione `.yaml`
 
-La scoperta dei servizi permette alle applicazioni di comunicare tra loro nel cluster. Spring Cloud Kubernetes utilizza il meccanismo di scoperta di Kubernetes, e consente di annotare componenti con `@LoadBalanced` per abilitare il bilanciamento del carico. Questo facilita la registrazione e la risoluzione dei servizi tra i microservizi.
+Vengono poi mostrati i principali comandi per la gestione degli addons in **Minikube** con i principali comandi.
 
-## 6. Gestione delle Risorse
+### 2.4 PODS
 
-La gestione delle risorse in Spring Cloud Kubernetes consente agli sviluppatori di controllare le risorse allocate alle applicazioni. Utilizzando annotazioni e configurazioni specifiche, è possibile gestire le risorse direttamente dal codice, ottimizzando l'uso delle risorse nel cluster.
+In K8S l'elemento base non è il container ma il **POD**. Esso è la più piccola unità che è possibile creare e gestire. Ogni POD è un contenitore che racchiude uno o più container, nel caso siano presenti più container essi hanno risorse di rete e di archiviazione condivise.
 
-## 7. Esempi di Utilizzo
+Principalmente in un POD possiamo trovare container applicativi che sono i responsabili dell'esecuzione delle applicazioni, ma possiamo trovare anche *init container* che si eseguono all'avvio del Pod e *container effimeri* utilizzati per il debug temporaneo.
 
-### 7.1. Configurazione con ConfigMap
+In K8S si gestiscono i Pod non i singoli container e lo si fa attraverso risorse come i Deployment che facilitano scalabilità e replicazione. Se si vuole per esempio aumentare le istanze di una applicazione è sufficiente creare più Pod identici, ognuno con una sua copia dell'applicazione così da distribuire il carico.
 
-Questo capitolo fornisce un esempio pratico di come utilizzare un `ConfigMap` per gestire la configurazione di un'applicazione Spring. Viene illustrato come creare un `ConfigMap` e accedervi attraverso l'annotazione `@Value`.
+Ogni Pod ha un proprio IP univoco. I container interni al pod comunicano tramite `localhost` mentre quelli esterni comunicano attraverso la rete condivisa.
 
-### 7.2. Scoperta dei Servizi
-
-Viene presentato un esempio di come configurare un client REST con bilanciamento del carico per la scoperta dei servizi, illustrando come garantire comunicazioni efficaci tra i microservizi.
-
-## 8. Limitazioni e Considerazioni
-
-In questo capitolo si discutono le limitazioni di Spring Cloud Kubernetes. Si evidenziano le differenze tra le configurazioni di Spring Cloud e Kubernetes, nonché alcune sfide comuni nell'uso del framework. Inoltre, viene suggerito di prestare attenzione alla compatibilità delle versioni e alle pratiche consigliate.
-
-## 9. Conclusioni
-
-Spring Cloud Kubernetes rappresenta un potente strumento per lo sviluppo di applicazioni cloud-native, offrendo funzionalità avanzate per la configurazione, la scoperta dei servizi e la gestione delle risorse. L'integrazione di Spring e Kubernetes semplifica la costruzione di architetture distribuite, ma richiede una buona comprensione dei concetti alla base di entrambi i framework.
-
-## 10. Riferimenti
-
-Questo capitolo elenca risorse utili e collegamenti a documentazione, tutorial e altre informazioni pertinenti per approfondire la conoscenza di Spring Cloud Kubernetes e le sue funzionalità. Questi riferimenti sono preziosi per chi desidera approfondire ulteriormente l'argomento e migliorare le proprie competenze nel contesto di Kubernetes e Spring.
-
+Sono poi elencati i possibili stati in cui può trovarsi un Pod.
