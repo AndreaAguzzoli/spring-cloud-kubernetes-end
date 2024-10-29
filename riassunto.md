@@ -45,3 +45,96 @@ In K8S si gestiscono i Pod non i singoli container e lo si fa attraverso risorse
 Ogni Pod ha un proprio IP univoco. I container interni al pod comunicano tramite `localhost` mentre quelli esterni comunicano attraverso la rete condivisa.
 
 Sono poi elencati i possibili stati in cui può trovarsi un Pod.
+
+### 2.5 Services
+
+In K8S un **Service** è un modo per esporre una applicazione di rete che viene poi eseguita come uno o più pod nel cluster.
+
+Il concetto è che si esegue il codice dell'applicazione nei pods e poi si utilizza un **service** per rendere quel gruppo accessibile sulla rete in modo che i client possano interagire con esso.
+
+In K8S i pod sono risorse effimere e vengano continuamente creati e distrutti, questo rende difficile il caso in cui una serie di pods forniscono funzionalità ad altri pods, come fanno i frontend a sapere a quale IP connettersi per comunicare con il backend?
+
+I Service definiscono quindi una **astrazione** che espone un insieme logico di endpoints e una policy su come rendere accessibili quei pods.
+
+### 2.6 ConfigMaps e Secrets
+
+Una **configMap** è un oggetto utilizzato per memorizzare dati non confidenziali in coppia chiave-valore. Si tratta di risorse utilizzate per gestire configurazioni esterne, in altre parole invece di incorporare configurazioni specifiche all'interno del codice o nell'immagine del container, queste vengono esternalizzate in una ConfigMap. (per esempio impostazioni diverse per ambiente di produzione o di sviluppo)
+
+Un **Secret** è un oggetto che contiene una piccola quantità di dati sensibili come un token o una password. Usare un Secret significa non includere dati riservati all'interno del codice della propria applicazione. Essi hanno un ciclo di vita indipendente rispetto ai pods che li utilizzano, questo fa si che diminuisca il rischio che vengano esposti dati sensibili in fase di creazione, visualizzazione o modifica dei pods.
+
+**Attenzione**: ConfigMap non fornisce segretezza o crittografia, quindi non è adatta a contenere dati sensibili. I Secrets sono memorizzati per default in modo non cifrato su etcd, quindi chiunque abbia accesso all'API o a etcd può recuperare o modificare un Secret, come chiunque abbia i permessi per creare un nuovo Pod in un namespace può leggere qualsiasi secret in quel namespace.
+
+### 2.7 Namespaces
+
+I namespaces offrono un modo per organizzare e isolare gruppi di risorse all'interno di un cluster. Le risorse all'interno dello stesso namespace devono avere nomi univoci, ma lo stesso nome può essere utilizzato in namespace diversi. Essi risultano particolarmente utili in ambienti con un elevato numero di utenti o progetti. Se non si ha una situazione come questa probabilmente essi non sono necessari, ma al crescere della complessità possono fornire funzionalità importanti.
+
+## 3. Deploy e Gestione delle applicazioni
+
+Sostanzialmente quello che avviene in K8S è che attraverso le risorse che creiamo viene definito lo stato che si desidera per la propria applicazione e K8S si occupa di generare una serie di passaggi necessari per raggiungere quello stato.
+
+Le 2 principali risorse di cui abbiamo bisogno sono **Service** e **Deployment**.
+
+I Deloyment sono la prima risorsa di cui abbiamo bisogno che ci serve per gestire le istanze dei container della nostra applicazione. Ci aiuta a creare, gestire e scalare i nostri Pods e le relative repliche. Definisce uno stato desiderato che poi K8S manterrà attivo senza necessità di interventi manuali. Il deployment tuttavia non definisce come esporre i pods per fare questo abbiamo bisogno dei service.
+
+Come abbiamo già detto prima i Service si usano per esporre i Pod sulla rete e forniscono una destinazione stabile che i client possono utilizzare per accedere ad una determinata funzionalità.
+
+Solitamente è una best practice memorizzare le risorse correlate alla stessa applicazione nello stesso file `.yaml`, quindi creare un unico file con una parte di deployment e una di service, ma non è obbligatorio. Una best practice importante è di unire tutti i file `.yaml` in un'unica directory chiamata `/kube` con cui andremo applicare tutto in una volta sola e non un file alla volta.
+
+### Self-healing
+
+Una delle funzionalità più potenti di K8S è il **self-healing** ovvero la capacità di intraprendere in modo autonomo azioni correttive per mantenere lo stato desiderato. Viene fatto attraverso una serie di azioni, come il riavvio, la sostituzione o la ripianificazione dei pod in caso di failure, il mantenimento di un corretto numero di repliche e terminando e sostituendo i pod che non rispondono positivamente ai controlli di integrità. 
+
+è presente poi una descrizione più dettagliata sui controller responsabili di queste azioni e su come avvengono i controlli di integrità.
+
+### Autoscaling
+
+Viene poi presentata un'altra importante funzionalità di K8S ovvero l'autoscaling. In K8S è possibile sia lo scaling orizzontale, incrementando o decrementando il numero di repliche e sia lo scaling verticolare incrementando o decrementando la quantità di risorse destinata ai Pod.
+
+In K8S questo avviene in modo automatico, ma è possibile anche una interazione manuale e sono presenti un paio di link su cui reperire maggiori informazioni.
+
+Sono poi presenti informazioni sui controller responsabili dello scaling orizzontale e verticale e sul Cluster Proportional Autoscaler che incrementa il numero di nodi se non ci sono risorse sufficienti per i nuovi Pod ed elimina invece quelli sotto utilizzati.
+
+### Rollout e Rollback
+
+Viene definito rollout il processo con cui si apportano modifiche all'applicazione. K8S permette di farlo in modo controllato e di definire la strategia con cui si vuole che le modifiche si propaghino all'interno dell'applicazione. Può essere utilizzata la strategia **recreate** che ricrea contemporaneamente tutte le istanze, può essere problematico perchè crea downtime. Un'altra strategia è **RollingUpdate** che è il metodo di default ed è più graduale operando a mano a mano su sottoinsiemi di pods.
+
+È presente un esempio per capire meglio di cosa si sta parlando.
+
+È possibile anche il **rollback** che è particolarmente utile nel caso in cui uno o più aggiornamenti causino un comportamento imprevisto. Consente di tornare in modo rapido ad uno stato funzionante. Avviene sostanzialmente come su github, si sceglie nella cronologia dei rollout a quale stato tornare e ci si torna. Sono poi presenti tutti i comandi necessari per eseguirlo correttamente.
+
+### Service Discovery e Load Balancing
+
+K8S fornisce meccanismi integrati di load balancing e di service discovery che non rendono necessarie configurazioni manuali. Il service discovery può essere **DNS-based** o **Environment-variables based**. 
+
+In K8S viene definito un DNS interno al cluster e ad ogni service viene dato un nome DNS e i pod possono comunicare tra loro utilizzando direttamente questi nomi all'interno del cluster.
+
+Quando viene avviato un Pod vengono iniettate una serie di variabili d'ambiente contenenti info sui servizi disponibili come indirizzo e numero di porta. Viene utilizzato in casi più semplici o legacy. Nel nostro caso abbiamo appunto utilizzato questa tecnica per semplicità.
+
+Quando si parla invece di **load balancing** si parla della distribuzione uniforme del traffico ai vari pod di un cluster per garantire disponibilità e affidabilità. Questo può essere fatto in diversi modi a seconda del caso d'uso.
+
+- Se si crea un **clusterIP** è di tipo **INTERNAL**, in questo caso il traffico viene mandato tutto all'IP del cluster e distribuito in modo equo ai pods in salute. 
+
+- Se è **EXTERNAL** si può creare un tipo di service **loadBalancer** che interagisce con il cloud provider per creare un bilanciatore esterno. Oppure si può usare il tipo **NodePort** che apre una porta specifica su tutti i nodi e garantisce che il traffico venga smistato in modo equo tra i pods su quella porta.
+
+- Oppure è possibile utilizzare **INGRESS** che fornisce un modo per esporre servizi su HTTP e HTTPS e consente di definire regole di instradamento del traffico avanzate, consentendo se si vuole anche di bilanciare il traffico creando un load balancer di livello applicativo.
+
+## 4. Minikube
+
+Minikube è uno strumento che consente di creare un cluster K8S in ambiente locale e risulta particolarmente utile per gli sviluppatori che desiderano testare e sviluppare in ambiente locale prima di spostare in produzione. Minikube fornisce in ogni caso un ambiente K8S completo e configurabile. Esso ha bisogno di un Container Manager come Docker o di un ambiente di virtualizzazione come per esempio KVM per funzionare, il motivo è che lo utilizzerà per creare e gestire la VM su cui gira l'ambiente locale K8S.
+
+In questo capitolo è presente una piccola presentazione di Minikube e una guida all'installazione e all'uso con link che rimandano alla documentazione ufficiale per l'installazione e i principali comandi da usare per un primo approccio efficace.
+
+### 4.2.3 Controllo degli accessi
+
+Mi soffermo un attimo su un concetto presente in questo capitolo che è il controllo degli accessi che permette di decidere chi può fare cosa e di limitarlo. In K8S questo può essere fatto in 3 modi:
+
+- **Autenticazione**: consiste appunto nel verificare l'identità di chiunque effettui una richiesta al cluster. K8S supporta diversi metodi di autenticazione
+
+- **Autorizzazione**: È la fase dopo l'autenticazione, in cui si controlla se quel tipo di utente può svolgere quel tipo di azione. Ci sono diversi tipi di questo meccanismo e il più usato è RBAC dove sono presenti *Role* e *ClusterRole* che definiscono le autorizzazione e i *RoleBinding* e i *ClusterRoleBinding* che associano le autorizzazioni agli utenti. È il più utilizzato perchè anche in casi complessi definisce un modo chiaro e semplice di definizione delle autorizzazioni.
+
+- **Admission Control**: è una eventuale terza fase dopo quella di autorizzazione che verifica attraverso dei plugin se modificare o bloccare le richieste in base a se soddisfano certi criteri.
+
+È poi presente un esempio abbastanza dettagliato su quali sono i comandi e come sono fatti i file `.yaml` per la gestione dei ruoli in K8S.
+
+## 5. Storage
+
