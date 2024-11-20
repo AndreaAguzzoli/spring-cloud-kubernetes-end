@@ -12,8 +12,8 @@ Il codice è preso da un esempio fatto in aula. Nell'esempio fatto in aula erano
 ### Funzionamento
 
 - 2 servizi che espongono **data** e **ora** (`date-service`, `time-service`)
-- Un servizio che otteneva la data e l'ora dai 2 servizi precedenti ed esponeva una combinazione delle due (`composite-service`)
-- Un servizio si Service Discovery
+- Un servizio che otteneva la data e l'ora dai 2 servizi precedenti ed esponeva una **combinazione** delle due (`composite-service`)
+- Un **Discovery Server** (`Eureka-Server`)
 
 ## Versione K8S
 
@@ -28,7 +28,7 @@ Nell'esempio si utilizza Minikube e il **namespace di default**, ma il formato d
 - `time-service.default.svc.cluster.local`
 - `composite-service.default.svc.cluster.local`
 
-#### Service Discovery
+### Service Discovery
 
 Ho deciso di utilizzare il Service Discovery di Kubernetes attraverso le **variabili d'ambiente**.
 
@@ -73,7 +73,7 @@ Qui entra in gioco Kubernetes che attraverso il suo **DNS interno** risolve il n
 
 ## Differenze
 
-#### Spring vs K8S
+### Spring vs K8S
 
 **Cosa continua a fare Spring:**
 
@@ -86,7 +86,7 @@ Qui entra in gioco Kubernetes che attraverso il suo **DNS interno** risolve il n
 
 **Cosa fa Kubernetes:**
 
-- Gestisce il **Service Discovery** attraverso la risolvendo i nomi `date-service`, `time-service` nel cluster.
+- Gestisce il **Service Discovery** risolvendo i nomi `date-service`, `time-service` nel cluster.
 - Gestisce il **Networking** instradando le richieste HTTP dal Pod di `composite-service` a quelli di `date-service` e `time-service`.
 - Garantisce che i Pod siano correttamente in esecuzione e ridireziona il traffico in caso di malfunzionamenti.
 
@@ -108,25 +108,25 @@ Un Deployment Kubernetes è chiamato **Cluster** ed è costituito da un insieme 
 
 L'architettura di un cluster è basata su un modello **Master-Worker** dove il master è detto **Control Plane Node** mentre i nodi di elaborazione dove sono ospitati i **Pods** sono detti **Workers**.
 
-#### Control Plane Node
+### Control Plane Node
 
 Tipicamente il **Control Plane Node** è responsabile delle decisioni globali sul cluster come **Scheduling** o **risposta agli eventi**. Tipicamente il Control Plane è presente su **un solo nodo** separato dagli workers, tuttavia sono possibili anche architetture **multi-master**.
 
-#### Workers
+### Workers
 
 I **worker nodes** sono i nodi che **eseguono i container** delle applicazioni. Ogni worker contiene dei **pods** che contengono i containers (tipicamente uno). I **Workers** comunicano con il **Master** che **assegna loro i pods** e gestisce la loro **configurazione**. 
 
-#### Addons 
+### Addons 
 
-Sono funzionalità aggiuntive disponibili per ampliare le funzionalità del cluster. Portano funzionalità a volte essenziali come per esempio **DNS**, **Dashboard**, **monitoraggio**, **logging** e molto altro.
+Sono funzionalità aggiuntive per ampliare le potenzialità del cluster. Portano funzionalità a volte essenziali come per esempio **DNS**, **Dashboard**, **monitoraggio**, **logging** e molto altro.
 
 La maggior parte di essi possono essere integrati attraverso file `YAML`.
 
 Ho poi dato la lista dei principali comandi per la loro gestione in Minikube.
 
-#### Pods
+### Pods
 
-In Kubernetes non si parla mai di container, ma di **pods**. Essi sono la più piccola unità di elaborazione in Kubernetes e sono letteralmente dei contenitori che contengono uno o più pod. Tipicamente contengono un solo pod, ma possono esserci casi in cui ne contengono diversi, in questo caso essi vengono gestiti come un unica entità che ha risorse condivise all'interno del pod.
+In Kubernetes non si parla mai di container, ma di **pods**. Essi sono **la più piccola unità di elaborazione** in Kubernetes e sono letteralmente dei contenitori che contengono uno o più pod. Tipicamente contengono un solo container, ma possono esserci casi in cui ne contengono diversi, in questo caso essi vengono gestiti come un unica entità che ha risorse condivise all'interno del pod.
 
 I pod sono **entità usa e getta** e risiedono su un nodo del cluster dal momento in cui vengono creati fino a quando vengono terminati. Sono progettati per rappresentare una **singola istanza di una applicazione**, quindi per esempio per scalare orizzontalmente si creano più repliche dello stesso **pods**.
 
@@ -136,7 +136,7 @@ Per quanto riguarda il **networking** ad ogni pod viene assegnato un **indirizzo
 
 ## Deploy e Gestione
 
-#### Risorse K8S
+### Risorse K8S
 
 Per eseguire un progetto su Kubernetes si devono creare delle **risorse Kubernetes** sotto forma di file `YAML`. In questi file dobbiamo descrivere quale è lo stato desiderato della nostra applicazione e poi Kubernetes si occupa di mantenerlo in autonomia.
 
@@ -144,7 +144,7 @@ Molte di queste informazioni vengono descritte all'interno del **Deployment**. I
 
 Per esporre un pod è necessaria una risorsa di tipo **Service**. Essa rende un pod accessibile agli altri pod e agli utenti al di fuori del cluster, senza **Service** un pod non è accessibile. Kubernetes assegna ad ogni pod un IP, tuttavia esso gli appartiene finchè non termina, poi gliene viene assegnato un altro diverso. Questo risulta problematico per un client che vuole connettersi ad un servizio, ogni volta che un pod termina non sa più a chi connettersi. Qui entrano in gioco i **Service** che rappresenta una destinazione stabile, senza che i client debbano preoccuparsi degli indirizzi IP dinamici dei pods.
 
-#### Self Healing
+### Self Healing
 
 È una delle funzionalità più potenti di Kubernetes. È progettata per garantire **disponibilità** e **resilienza** delle applicazioni distribuite. È la funzionalità che mantiene il nostro **stato desiderato**.
 
@@ -155,11 +155,11 @@ Si tratta della capacità di monitorare lo stato delle risorse e di intraprender
 - mantenimento del numero di repliche
 - terminare e riavviare i pod che non rispondono bene agli health-check
 
-#### Scaling
+### Scaling
 
 In Kubernetes è possibile lo scaling orizzontale aumentano il numero di repliche, ma anche lo scaling verticale aumentando le risorse destinate ai pods.
 
-#### Rollout & Rollback
+### Rollout & Rollback
 
 **Rollout** è il processo attraverso il quale si apportano modifiche alle applicazioni. Kubernetes fornisce la possibilità di scegliere la **Strategy** con la quale propagare queste modifiche:
 
@@ -170,7 +170,7 @@ Quando si parla di **Rollback** ci si riferisce alla **capacità di ritornare ad
 
 Sono stati presentati anche una serie di comandi per la loro gestione in Kuberntes.
 
-#### Service Discovery & Load Balancing
+### Service Discovery & Load Balancing
 
 Oltre al service discovery utilizzando le variabili d'ambiente è possibile anche gestire la scoperta dei servizi direttamente attraverso i **nomi-DNS** e i **namespaces**. 
 
@@ -192,13 +192,13 @@ Quando si parla di **Load-Balancing** in Kubernetes ci si riferisce alla distrib
 
 ## Monitoraggio e Logging
 
-#### Monitoraggio
+### Monitoraggio
 
 In questo capitolo si parla di come gli strumenti di monitoraggio siano fondamentali per monitorare lo stato delle risorse del cluster e quindi per prevenire sovraccarichi.
 
 Viene poi descritta una guida passo-passo per installare **Prometheus**, **Grafana** ed **Helm**, dove quest'ultimo è un utile gestore di pacchetti che facilita l'installazione non solo di Prometheus e di Grafana ma anche di molti altri utili strumenti.
 
-#### Logging
+### Logging
 
 In questo capitolo si parla invece degli strumenti per il logging e di come essi siano importanti per comprendere meglio il comportamento delle applicazioni e risalire quindi alle cause dei problemi.
 
@@ -232,5 +232,5 @@ Questo capitolo non introduce nulla di nuovo, semplicemente è un elenco delle b
 
 Possiamo concludere dicendo che Kubernetes ha funzionalità che portano grandi vantaggi, ma porta con sè numerose insidie e costi, sia in termini economici che in termini di tempo:
 
-- Economici ${rightarrow}$ In questo caso è stato utilizzato attraverso Minikube in locale e quindi non abbiamo nessun costo, ma in caso reale ogni cluster, ogni nodo e ogni risorsa comporta costi aggiuntivi che vanno attentamente valutati e monitorati.
-- Tempo ${rightarrow}$ Portando con sè una grande complessità è difficile da imparare e il personale va correttamente formato e ci vuole diverso tempo per imparare ad usarlo correttamente.
+- Economici ${\rightarrow}$ In questo caso è stato utilizzato attraverso Minikube in locale e quindi non abbiamo nessun costo, ma in caso reale ogni cluster, ogni nodo e ogni risorsa comporta costi aggiuntivi che vanno attentamente valutati e monitorati.
+- Tempo ${\rightarrow}$ Portando con sè una grande complessità è difficile da imparare e il personale va correttamente formato e ci vuole diverso tempo per imparare ad usarlo correttamente.
